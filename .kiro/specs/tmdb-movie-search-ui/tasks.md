@@ -83,7 +83,7 @@
   - Test complete user journey from search to results
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 4.1_
 
-- [-] 12. Connect API calls to the UI workflow
+- [x] 12. Connect API calls to the UI workflow
   - Wire up SearchSubmitted message to trigger actual API calls
   - Implement async handling to call api.search_movies and dispatch MoviesLoaded
   - Add proper error conversion from API errors to user-friendly messages

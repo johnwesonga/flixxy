@@ -213,7 +213,8 @@ pub fn search_submitted_clears_previous_state_test() {
       error: Some("Previous error"),
     )
 
-  let updated_model = messages.update(model_with_data, models.SearchSubmitted)
+  let #(updated_model, _effect) =
+    messages.update(model_with_data, models.SearchSubmitted)
 
   updated_model.search_query |> should.equal("new search")
   updated_model.movies |> should.equal([])
@@ -226,7 +227,7 @@ pub fn error_state_overrides_loading_test() {
     models.Model(search_query: "batman", movies: [], loading: True, error: None)
 
   let error_message = "Network error"
-  let updated_model =
+  let #(updated_model, _effect) =
     messages.update(loading_model, models.MoviesLoaded(Error(error_message)))
 
   updated_model.loading |> should.equal(False)
@@ -243,7 +244,7 @@ pub fn loading_state_immediate_transition_test() {
       error: None,
     )
 
-  let updated_model = messages.update(model, models.SearchSubmitted)
+  let #(updated_model, _effect) = messages.update(model, models.SearchSubmitted)
 
   // Loading should be set to True immediately when search is submitted
   updated_model.loading |> should.equal(True)
@@ -260,7 +261,7 @@ pub fn loading_state_clears_on_success_test() {
     models.new_movie(1, "Batman", "Dark Knight", "2008", None, 9.0),
   ]
 
-  let updated_model =
+  let #(updated_model, _effect) =
     messages.update(loading_model, models.MoviesLoaded(Ok(test_movies)))
 
   // Loading should be False after successful results
@@ -275,7 +276,7 @@ pub fn loading_state_clears_on_error_test() {
     models.Model(search_query: "batman", movies: [], loading: True, error: None)
 
   let error_message = "API Error"
-  let updated_model =
+  let #(updated_model, _effect) =
     messages.update(loading_model, models.MoviesLoaded(Error(error_message)))
 
   // Loading should be False after error
@@ -290,12 +291,14 @@ pub fn multiple_search_submissions_loading_test() {
 
   // First search
   let model1 = models.set_search_query(initial_model, "batman")
-  let loading_model1 = messages.update(model1, models.SearchSubmitted)
+  let #(loading_model1, _effect1) =
+    messages.update(model1, models.SearchSubmitted)
   loading_model1.loading |> should.equal(True)
 
   // Second search while first is loading (simulates rapid user input)
   let model2 = models.set_search_query(loading_model1, "superman")
-  let loading_model2 = messages.update(model2, models.SearchSubmitted)
+  let #(loading_model2, _effect2) =
+    messages.update(model2, models.SearchSubmitted)
 
   // Should still be loading and previous results cleared
   loading_model2.loading |> should.equal(True)
@@ -308,7 +311,7 @@ pub fn loading_state_empty_query_validation_test() {
   let model =
     models.Model(search_query: "", movies: [], loading: False, error: None)
 
-  let updated_model = messages.update(model, models.SearchSubmitted)
+  let #(updated_model, _effect) = messages.update(model, models.SearchSubmitted)
 
   // Should not set loading state for empty query
   updated_model.loading |> should.equal(False)

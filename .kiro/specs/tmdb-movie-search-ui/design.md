@@ -27,8 +27,8 @@ The design focuses on creating a clean, responsive interface that efficiently co
 
 ```
 src/
-├── flixsta.gleam              # Main entry point and Lustre app initialization
-├── flixsta/
+├── flixxy.gleam              # Main entry point and Lustre app initialization
+├── flixxy/
 │   ├── models.gleam           # Data types and model definitions
 │   ├── api.gleam              # TMDB API client functions
 │   ├── views.gleam            # HTML view rendering functions
@@ -180,11 +180,11 @@ Internal types for handling TMDB API responses:
 ### Test Structure
 
 ```gleam
-// test/flixsta_test.gleam
+// test/flixxy_test.gleam
 import gleeunit
 import gleeunit/should
-import flixsta/models
-import flixsta/api
+import flixxy/models
+import flixxy/api
 
 pub fn main() {
   gleeunit.main()

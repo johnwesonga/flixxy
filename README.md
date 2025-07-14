@@ -1,18 +1,6 @@
 # flixxy
 
-[![Package Version](https://img.shields.io/hexpm/v/flixxy)](https://hex.pm/packages/flixxy)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/flixxy/)
-
-```sh
-gleam add flixxy@1
-```
-```gleam
-import flixxy
-
-pub fn main() -> Nil {
-  // TODO: An example of the project in use
-}
-```
+Flixxy is a Single Page Application built using Lustre that queries the TMDB api https://developer.themoviedb.org/reference/intro/getting-started and retrieve movies info.
 
 Further documentation can be found at <https://hexdocs.pm/flixxy>.
 
