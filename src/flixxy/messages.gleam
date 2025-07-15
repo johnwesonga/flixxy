@@ -3,6 +3,7 @@
 import flixxy/api
 import flixxy/models.{type Model, type Movie, type Msg}
 import lustre/effect.{type Effect}
+import rsvp
 
 // Update function to handle all message types and return effects
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -10,7 +11,9 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     models.SearchQueryChanged(query) ->
       handle_search_query_changed(model, query)
     models.SearchSubmitted -> handle_search_submitted(model)
+
     models.MoviesLoaded(result) -> handle_movies_loaded(model, result)
+    models.MoviesLoadedLive(result) -> handle_movies_loaded_live(model, result)
     models.ClearError -> handle_clear_error(model)
   }
 }
@@ -35,21 +38,21 @@ fn handle_search_submitted(model: Model) -> #(Model, Effect(Msg)) {
       let cleared_model = models.clear_error(model)
       let loading_model = models.set_loading(cleared_model, True)
       let updated_model = models.Model(..loading_model, movies: [])
-
+      // let search_effect = api.make_api_request_live(model.search_query)
       // Create effect to perform API call
-      let search_effect =
-        effect.from(fn(dispatch) {
-          let result = api.search_movies(model.search_query)
-          case result {
-            Ok(movies) -> dispatch(models.MoviesLoaded(Ok(movies)))
-            Error(api_error) -> {
-              let error_message = api.error_to_string(api_error)
-              dispatch(models.MoviesLoaded(Error(error_message)))
-            }
-          }
-        })
+      // let search_effect =
+      // effect.from(fn(dispatch) {
+      //   let result = api.search_movies(model.search_query)
+      //   case result {
+      //    Ok(movies) -> dispatch(models.MoviesLoadedLive(Ok(movies)))
+      //    Error(api_error) -> {
+      //      let error_message = api.error_to_string(api_error)
+      //     dispatch(models.MoviesLoaded(Error(error_message)))
+      //   }
+      //  }
+      // })
 
-      #(updated_model, search_effect)
+      #(updated_model, api.make_api_request_live(model.search_query))
     }
   }
 }
@@ -62,6 +65,16 @@ fn handle_movies_loaded(
   case result {
     Ok(movies) -> #(models.set_movies(model, movies), effect.none())
     Error(error_msg) -> #(models.set_error(model, error_msg), effect.none())
+  }
+}
+
+fn handle_movies_loaded_live(
+  model: Model,
+  result: Result(List(Movie), rsvp.Error),
+) -> #(Model, Effect(Msg)) {
+  case result {
+    Ok(movies) -> #(models.set_movies(model, movies), effect.none())
+    Error(_error_msg) -> #(models.set_error(model, "Error"), effect.none())
   }
 }
 

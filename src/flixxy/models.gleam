@@ -1,6 +1,7 @@
 // Core data models and types for the Flixxy movie search application
 
 import gleam/option.{type Option, None, Some}
+import rsvp
 
 // Movie data structure from TMDB API
 pub type Movie {
@@ -29,6 +30,7 @@ pub type Msg {
   SearchQueryChanged(String)
   SearchSubmitted
   MoviesLoaded(Result(List(Movie), String))
+  MoviesLoadedLive(Result(List(Movie), rsvp.Error))
   ClearError
 }
 
