@@ -11,7 +11,6 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     models.SearchQueryChanged(query) ->
       handle_search_query_changed(model, query)
     models.SearchSubmitted -> handle_search_submitted(model)
-
     models.MoviesLoaded(result) -> handle_movies_loaded(model, result)
     models.MoviesLoadedLive(result) -> handle_movies_loaded_live(model, result)
     models.ClearError -> handle_clear_error(model)
@@ -74,11 +73,25 @@ fn handle_movies_loaded_live(
 ) -> #(Model, Effect(Msg)) {
   case result {
     Ok(movies) -> #(models.set_movies(model, movies), effect.none())
-    Error(_error_msg) -> #(models.set_error(model, "Error"), effect.none())
+    Error(error) -> {
+      echo "Error loading movies: " <> decode_error_to_string(error)
+      #(models.set_error(model, decode_error_to_string(error)), effect.none())
+    }
   }
 }
 
 // Handle clearing error state
 fn handle_clear_error(model: Model) -> #(Model, Effect(Msg)) {
   #(models.clear_error(model), effect.none())
+}
+
+fn decode_error_to_string(error: rsvp.Error) -> String {
+  case error {
+    rsvp.BadBody -> "Bad body"
+    rsvp.BadUrl(err) -> "Bad URL: " <> err
+    rsvp.HttpError(_) -> "HTTP error"
+    rsvp.JsonError(_) -> "JSON decoding error"
+    rsvp.NetworkError -> "Network error"
+    rsvp.UnhandledResponse(_) -> "Unhandled response"
+  }
 }

@@ -37,6 +37,18 @@ pub fn search_movies(query: String) -> Result(List(Movie), ApiError) {
   }
 }
 
+pub fn search_movies_live(query: String) -> effect.Effect(models.Msg) {
+  // Create an effect to perform the API call asynchronously
+  case string.trim(query) {
+    "" -> effect.none()
+    trimmed_query -> {
+      let url = build_search_url(trimmed_query)
+      let handler = rsvp.expect_json(results_decoder(), models.MoviesLoadedLive)
+      rsvp.get(url, handler)
+    }
+  }
+}
+
 // Make API request using RSVP (asynchronous, returns Effect)
 pub fn make_api_request_live(query: String) -> effect.Effect(models.Msg) {
   let url = build_search_url(query)
